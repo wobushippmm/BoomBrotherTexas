@@ -16,3 +16,6 @@
 		解释一下SOS：c白白自创名词，Server of server 的缩写，即游戏服务器都连接与一个中心服务器，通过中心服务器管理其它服务器。
 		
 客户端：cocos creator开发html5客户端程序，主要技术：protocobuf-js，h5 websocket。
+
+游戏demo地址：http://121.42.161.244/poker/
+账号密码任意，排队后等待60秒无足够玩家则自动添加AI陪玩。
