@@ -1,0 +1,26 @@
+{
+  "appKey": "",
+  "appSecret": "",
+  "excludeScenes": [
+    "0e6ed291-ed54-4c3a-849a-e413a2e461bc"
+  ],
+  "includeAnySDK": false,
+  "includeSdk": [
+    "anysdk"
+  ],
+  "inlineSpriteFrames": true,
+  "mergeStartScene": false,
+  "oauthLoginServer": "",
+  "orientation": {
+    "landscapeLeft": true,
+    "landscapeRight": true,
+    "portrait": false,
+    "upsideDown": false
+  },
+  "packageName": "org.cocos2d.PokerGame",
+  "privateKey": "",
+  "renderMode": "0",
+  "startScene": "34c12230-5497-4163-ab12-1b9b457b24b6",
+  "title": "PokerGame",
+  "webOrientation": "landscape"
+}

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Selector>
+  <Sequence>
+	<Condition Class="Satisfy" Act="Check"></Condition>
+	<Condition Class="Random" Rate="0.8"></Condition>
+    <Action Class="Check"></Action>
+  </Sequence>
+  <Sequence>
+	<Condition Class="Satisfy" Act="Call"></Condition>
+    <Condition Class="Random" Rate="0.5"></Condition>
+    <Action Class="Call"></Action>
+  </Sequence>
+  <Sequence>
+ 	<Condition Class="Satisfy" Act="Raise"></Condition>
+	<Condition Class="Random" Rate="0.3"></Condition>
+    <Action Class="Raise"></Action>
+  </Sequence>
+  <Sequence>
+ 	<Condition Class="Satisfy" Act="Allin"></Condition>
+	<Condition Class="Random" Rate="0.3"></Condition>
+    <Action Class="Allin"></Action>
+  </Sequence>
+  <Action Class="Fold"></Action>
+</Selector>

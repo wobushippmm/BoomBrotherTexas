@@ -1,0 +1,184 @@
+syntax = "proto3";
+
+option java_package="protocol";
+option java_outer_classname="TexasGameData";
+
+// po 协议框架，不要自定义
+// req client->server 
+// rep server->client
+// rpc server->server
+// dat data
+// enm enum
+
+////////////////// 德州 //////////////////////////
+
+// 牌局信息
+message SeatInfoDat{
+	string username = 1;
+	int32 gold = 2;
+	int32 bet = 3;
+	bool isOut = 4;
+	ActionEnm action = 5;
+	repeated int32 cards = 6;
+	string nickname = 7;
+	string portrait = 8;
+	bool isOffline = 9;
+}
+// 客户端收到onStartGame 进入牌局
+message TableInfoRep{
+	int32 id = 1;
+	repeated SeatInfoDat seats = 2;
+	repeated int32 pubCards = 3;
+	int32 currBet = 4;
+	TableModeEnm mode = 5;
+	int32 turn = 6;
+	int64 time = 7; // 当前操作的剩余时间
+	bool isRejoin = 8; // 是否是断线重连
+}
+// 开始一个新牌局
+message StartRoundRep{
+	repeated int32 pubCards = 1; // 公共牌
+	repeated int32 seatCards = 2; // 玩家牌
+	int32 butten = 3; // 庄家
+	int32 blinds = 4; // 小盲注额
+}
+
+enum ActionEnm{
+	UNDEFINE_ACTION = 0;
+	WAIT = 1; // 还未行动
+	CHECK = 2; // 让牌
+	CALL = 3; // 跟注
+	RAISE = 4; // 加注
+	ALLIN = 5; // all in
+	FOLD = 6; // 弃牌
+}
+// 通知客户端行动
+message CallActionRep{
+	int32 seat = 1;
+}
+
+// 客户端下注
+message ActionReq{
+	ActionEnm action = 1;
+	int32 bet = 2;
+}
+enum ActionResultEnm{
+	UNDEFINE_ACTIONRESULT = 0;
+	OK_ACTIONRESULT = 1;
+	GOLD_NOT_ENOUGH = 2; // 金币不足
+	ACTION_INVALIDITY = 3; // 操作非法
+	NOT_YOUR_TURN = 4; // 未轮到
+}
+// 下注广播
+message ActionRep{
+	ActionResultEnm result = 1;
+	int32 seat = 2;
+	ActionEnm action = 3;
+	int32 gold = 4;
+	int32 bet = 5;
+}
+
+// 位置类型
+enum SeatTypeEnm{
+	UNDEFINE_SEATTYPE = 0;
+	NOBODY = 1; // 空位置
+	PLAYER = 2;
+	AI = 3; // 玩家类型
+}
+
+// 发牌
+message SendCardRep{
+	int32 card = 1;
+}
+
+// 离开桌子
+message LeaveTableReq{
+}
+
+// 离开桌子
+message LeaveTableRep{
+	int32 seat = 1;
+}
+message WinnerDat{
+	int32 seat = 1;
+	repeated int32 cards = 2; // 赢的牌型
+	int32 gold = 3;
+	int32 bet = 4; // 注额
+}
+message SeatCardDat{
+	int32 seat = 1;
+	repeated int32 cards = 2; // 牌
+}
+// 一局结果
+message RoundResultRep{
+	repeated WinnerDat winners = 1;
+	repeated SeatCardDat seats = 2; // 各个座位牌信息
+}
+enum TableModeEnm{
+	UNDEFINE_TABLEMODE = 0;
+	MODE_NORMAL_5 = 1; // 5人匹配场
+	MODE_NORMAL_7 = 2; // 7人匹配
+	MODE_RICH_5 = 3; 
+	MODE_RICH_7 = 4; 
+	MODE_SUPER_RICH_5 = 5; 
+	MODE_SUPER_RICH_7 = 6; 
+}
+// 匹配牌局
+message MatchTableReq{
+	TableModeEnm mode = 1; // 人数
+}
+enum MatchTableResultEnm{
+	UNDEFINE_MATCHTABLERESULT = 0;
+	OK_MATCHTABLERESULT = 1;
+	ALREADY_IN_QUEUE = 2;
+	GOLD_NOT_ENOUGH_MATCHTABLERESULT = 3;
+}
+message MatchTableRep{
+	MatchTableResultEnm result = 1;
+}
+// 取消匹配
+message CancelMatchTableReq{
+}
+message CancelMatchTableRep{
+}
+// 加入牌桌
+message JoinTableReq{
+	int32 id = 1;
+}
+enum JoinTableResultEnm{
+	UNDEFINE_JOINTABLERESULT = 0;
+	OK_JOINTABLERESULT = 1;
+	NO_EMPTY_SEAT = 2;
+	TABLE_DISTROYED = 3;
+	GOLD_NOT_ENOUGH_JOINTABLERESULT = 4;
+}
+// 加入牌桌返回
+message JoinTableRep{
+	JoinTableResultEnm result = 1;
+}
+// 有人加入
+message SitDownSeatInfoRep{
+	int32 seatIndex = 1;
+	SeatInfoDat seatInfo = 2;
+}
+// 获取桌子列表
+message GetTableListReq{
+	int32 startIndex = 1; // 列表开始序号，一次只发送20个
+}
+message TableInfoDat{
+	int32 id = 1;
+	int32 emptySeat = 2; // 空位置
+	TableModeEnm mode = 3;
+}
+// 返回桌子列表
+message GetTableListRep{
+	repeated TableInfoDat tableList = 1;
+}
+// 掉线通知
+message SeatOfflineRep{
+	int32 seat = 1; // 
+}
+// 上线通知
+message SeatOnlineRep{
+	int32 seat = 1; 
+}

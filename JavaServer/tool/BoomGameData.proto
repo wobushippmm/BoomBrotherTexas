@@ -1,0 +1,269 @@
+syntax = "proto3";
+
+option java_package="protocol";
+option java_outer_classname="BoomGameData";
+
+// po 协议框架，不要自定义
+// req client->server 
+// rep server->client
+// rpc server->server
+// dat data
+// enm enum
+
+///////////////////// 爆炸兄弟 //////////////////////////
+// 排位请求
+message MatchBattleReq{
+
+}
+enum MatchBattleResultEnm{
+	UNDEFINE_MATCHBATTLERESULT = 0;
+	OK_MATCHBATTLERESULT = 1;
+	ALREADY_IN_MATCH_QUEUE = 2;
+	ALREADY_IN_BATTLE_FIELD = 3; // 已经在战场
+}
+// 匹配返回
+message MatchBattleRep{
+	MatchBattleResultEnm result = 1;
+}
+// 取消匹配
+message CancelMatchBattleReq{
+}
+//
+message CancelMatchBattleRep{
+}
+// 战场玩家信息
+message BattleUserInfoDat{
+	string username = 1;
+	int32 level = 2; // 等级
+}
+// 战场信息
+message BattleFieldInfoRep{
+	int32 id = 1;
+	repeated BattleUserInfoDat team1 = 2;
+	repeated BattleUserInfoDat team2 = 3;
+}
+// 离开战场
+message LeaveBattleReq{
+}
+// 离开战场通知
+message LeaveBattleRep{
+	string username = 1; // 离开的玩家
+}
+// 客户端移动位置请求
+message MoveToReq{
+	int32 x = 1;
+	int32 y = 2;
+}
+// 服务端通知客户端移动
+message MoveToRep{
+	int32 id = 1; // 移动物体id，可能是人，可能是战场物体
+	int32 x = 2;
+	int32 y = 3;
+}
+// 客户端使用技能
+message UseSkillReq{
+	int32 skillID = 1; 
+	int32 target = 2; // 目标id
+	int32 tox = 3; // 目标位置
+	int32 toy = 4; 
+}
+// 使用技能通知
+message UseSkillRep{
+	int32 source = 1; // 技能使用者
+	int32 skillID = 2;
+	int32 target = 3;
+	int32 tox = 4;
+	int32 toy = 5;
+}
+// 技能命中
+message SkillHitRep{
+
+}
+// 增加战场实体
+message AddBattleEntityRep{
+	int32 source = 1; // 战场实体来源
+	int32 id = 2;
+	int32 tempID = 3; // 实体模板id
+	int32 x = 4; // 实体位置
+	int32 y = 5; // 
+}
+// 移除战场实体，当移除的时候可以播放爆炸等动作
+message RemoveBattleEntityRep{
+	int32 id = 1; // 实体id
+}
+// 属性类型
+enum PropertyEnm{
+	UNDEFINE_PROPERTY = 0;
+	EXP = 1;
+	HP = 2; // 属性值
+	HP_MAX = 3; // 最大生命值
+	MP = 4;
+	MP_MAX = 5; // 最大魔法值
+	SPEED = 6; // 移动速度
+	ATTACK = 7; // 攻击力
+	ATTACK_DEFENSE = 8;
+	ATTACK_SPEED = 9;
+	ATTACK_SHIELD = 10; // 物理盾牌，抵消物理伤害
+	MAGIC = 11; // 法术强度
+	MAGIC_DEFENSE = 12; // 法抗
+	MAGIC_COOL_DOWN = 13; // cd
+	MAGIC_SHIELD = 14; // 法术盾牌，抵消法术伤害
+	CRIT_RATE = 15; // 暴击率
+	CRIT_DEMAGE = 16; // 暴击伤害
+	CRIT_SHIELD = 17; // 暴击盾牌，抵消暴击伤害
+	REAL_DEMAGE = 18; // 真实伤害
+	GOLD = 19;
+}
+// 属性值
+message PropertyDat{
+	PropertyEnm property = 1;
+	int32 value = 2;
+}
+// 属性更新，可能增加，可能减少，可能同时改变几个属性
+message PropertyUpdateRep{
+	int32 id = 1; // 实体id
+	repeated PropertyDat properties = 2;
+}
+// 掉线通知
+message HeroOfflineRep{
+	string username = 1;
+	bool isOffline = 2;
+}
+// call ban hero
+message CallBanHeroRep{
+	string username = 1;
+}
+message BanHeroReq{
+	int32 heroTempID = 1;
+}
+enum BanHeroResultEnm{
+	UNDEFINE_BANHERORESULT = 0;
+	OK_BANHERORESULT = 1;
+	FAIL_BANHERORESULT = 2;
+}
+message BanHeroRep{
+	BanHeroResultEnm result = 1;
+	string username = 2;
+	int32 heroTempID = 3;
+}
+// call select hero
+message CallSelectHeroRep{
+	string username = 1;
+}
+message SelectHeroReq{
+	int32 heroTempID = 1;
+}
+enum SelectHeroResultEnm{
+	UNDEFINE_SELECTHERORESULT = 0;
+	OK_SELECTHERORESULT = 1;
+	FAIL_SELECTHERORESULT = 2;
+}
+message SelectHeroRep{
+	SelectHeroResultEnm result = 1;
+	string username = 2;
+	int32 heroTempID = 3;
+}
+// 由于某些原因重新排队
+enum RematchCauseEnm{
+	UNDEFINE_REMATCHCASE = 0;
+	SOMEONE_RUN = 1;
+	NOT_READY = 2;
+}
+// 逃跑者也会收到，但不能进入匹配状态，其它玩家进入匹配
+message RematchBattleRep{
+	RematchCauseEnm cause = 1;
+	string runner = 2;
+}
+
+enum CampTypeEnm{
+	UNDEFINE_CAMPTYPE = 0;
+	BOOM_CAMP = 1; // 爆炸阵营
+	RULER_CAMP = 2; // 黑暗阵营
+	NEUTRAL_CAMP = 3; // 中立阵营
+}
+// 战斗结果
+message BattleResultRep{
+}
+enum BattleEntityTypeEnm{
+	UNDEFINE_BATTLEENTITYTYP = 0;
+	HERO_ENTITY = 1;
+	SOLDIER_ENTITY = 2;
+	NEUTRAL_ENTITY = 3;
+	BUILDING_ENTITY = 4; //防御塔,小炮台等
+	TRAP_ENTITY = 5; // 各种技能效果，
+}
+
+enum BattlePlayerTypeEnm{
+	UNDEFINE_BATTLEPLAYERTYPE = 0;
+	PLAYER_BP = 1;
+	AI_BP = 2;
+}
+// 实体数据
+message BattleEntityDat{
+	string username = 1;
+	int32 id = 2;
+	int32 hp = 3;
+	int32 hpMax = 4;
+	int32 speed = 5;
+	int32 x = 6;
+	int32 y = 7;
+}
+// 战场实体信息
+message BattleFieldEntityRep{
+	repeated BattleEntityDat entityList = 1;
+}
+
+// 加载完成，客户端向服务端发送，如果未收到rep，持续向服务端发送
+// 使用udp向服务端发送，服务端通过这个接口绑定客户端
+message BattleLoadCompletedReq{
+	string username = 1; // 需要身份验证
+	int32 cid = 2; // 验证数字
+	int32 percent = 3; // 百分比 0-100
+}
+// 客户端接收到这个表示服务端绑定udp成功，可能是别人加载成功
+message BattleLoadCompletedRep{
+	string username = 1;
+	int32 percent = 2; // 百分比 0-100
+}
+// 准备战斗，出门
+message ReadyForFightingRep{
+}
+// 开始战斗
+message StartFightingRep{
+}
+
+enum BattleActionTypeEnm{
+	UNDEFINE_BATTLEACTIONTYPE = 0;
+	MOVE_BATTLE = 1;
+	SKILL_BATTLE = 2;
+}
+// 行动
+message BattleActionReq{
+	string username = 1; // 用户
+	int32 cid = 2; // 验证数字
+	BattleActionTypeEnm action = 3;
+	int32 skillID = 4; // 技能id
+	int32 toX = 5; // 目标位置
+	int32 toY = 6;
+	int32 target = 7; // 目标id
+}
+// 
+message BattleActionRep{
+	int32 entityID = 1;
+	int32 skillID = 2;
+	int32 toX = 3;
+	int32 toY = 4;
+	int32 target = 5;
+}
+// 死亡
+message EntityDeadRep{
+	int32 entityID = 1;
+}
+// 添加rule，带有显示或者特效
+message AddBuffRep{
+	
+}
+// 删除rule
+message RemoveBuffRep{
+
+}

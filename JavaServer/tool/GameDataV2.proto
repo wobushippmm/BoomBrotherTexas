@@ -1,0 +1,870 @@
+//syntax = "proto3";
+
+//option java_package="protocol";
+//option java_outer_classname="GameData";
+
+// po 协议框架，不要自定义
+// req client->server 
+// rep server->client
+// rpc server->server
+// dat data
+// enm enum
+
+// 服务器之间打招呼
+message HelloRpc{
+	optional string type = 1;
+	optional int32 port = 2;
+	optional string name = 3;
+	optional int32 websocketPort = 4;
+	optional int32 udpPort = 5;
+}
+
+// sos退出
+message QuitRpc{
+
+}
+
+// 心跳
+message HeartRpc{
+}
+
+// 网络地址
+message AddressDat{
+	optional string address = 1;
+	optional int32 port = 2;
+	optional string name = 3;
+	optional string type = 4;
+	optional int32 websocketPort = 5;
+	optional int32 udpPort = 6;
+}
+
+// 服务器列表
+message ServerListRpc{
+	repeated AddressDat serverList = 1;
+}
+
+// 所有消息的最终格式
+message RpcPo{
+	optional string rpc = 1; // rpc函数名
+	optional HelloRpc helloRpc = 2;
+	optional ServerListRpc serverListRpc = 3;
+	optional QuitRpc quitRpc = 4;
+	optional HeartRpc heartRpc = 5;
+	optional bytes anyPo = 6; // 二次序列化的数据，兼容后续自定义的消息
+	optional string clientName = 7; // 发送给客户端的时候，或发给逻辑服的时候用
+	optional string gateway = 8; // 客户端绑定的gateway
+}
+
+
+enum DisconnectCauseEnm{
+	LOGIN_OTHER_CLIENT = 1; // 其它地方登陆
+}
+// 掉线通知
+message DisconnectRep{
+	optional DisconnectCauseEnm cause = 1;
+}
+
+//////////////////////////////////////////////////////
+
+// po 协议框架，不要自定义
+// req client->server 
+// rep server->client
+// rpc server->server
+// dat data
+// enm enum
+
+// 发给玩家本人的数据
+message UserDat{
+	optional string username = 1;
+	optional int64 cid = 2; // 登录成功则带有一个验证id
+	optional int32 level = 3;
+	optional int32 gold = 4;
+	optional string gateway = 5; // 在服务器之间传递是需要携带gateway
+	optional string battle = 6; // 服务器之间传递用
+	optional string scene = 7; // 服务器之间传递用
+	optional int32 winCount = 8;
+	optional int32 gameCount = 9;
+}
+
+// 返回结果枚举
+enum LoginResultEnm{
+	OK_LOGINRESULT = 1; // 成功
+	PASSWORD_ERROR = 2; // 密码错误
+	CREATE_ACCOUNT = 3; // 创建新帐号
+	USERNAME_ERROR = 4; // 用户名错误
+	ACCOUNT_FREEZE = 5; // 账号冻结
+	LACK_PARAMETER = 6; // 缺少参数
+}
+// 登录请求
+message LoginReq{
+	optional string username = 1;
+	optional string password = 2;
+}
+
+// 登录返回
+message LoginRep{
+	optional LoginResultEnm result = 1;
+	optional string gatewayHost = 2; // gateway
+	optional int32 gatewayPort = 3;
+	optional int64 cid = 4;
+}
+// 连接到gateway
+message ConnectReq{
+	optional string username = 1;
+	optional int64 cid = 2;
+}
+// 进入到某个场景
+message EnterSceneRpc{
+	optional string username = 1; // scene->scene 时需要usrname
+	optional int64 cid = 2;
+}
+// 通知进入场景
+message EnterSceneRep{
+	optional string username = 1;
+	optional string scene = 2;
+	optional UserDat userDat = 3; // 玩家数据 
+}
+// 客户端退出场景
+message ExitSceneRpc{
+	optional string username = 1;
+}
+message ExitSceneRep{
+	optional string username = 1;
+}
+// 请求切换场景
+message ChangeSceneReq{
+	optional string scene = 1; // 切换到的场景
+}
+enum ChangeSceneResultEnm{
+	OK_CHANGESCENERESULT = 1;
+	LEVEL_NOT_ENOUGHT = 2;
+	SCENE_CONNECT_FAIL = 3; // 连接场景失败
+}
+// 通知玩家改变场景
+message ChangeSceneRep{
+	optional ChangeSceneResultEnm result = 1;
+	optional string scene = 2; // 切换到的场景
+}
+
+// 玩家掉线
+message ClientDisconnectRpc{
+	optional string username = 1;
+}
+
+
+// 加入战斗频道
+message JoinBattleReq{
+	optional string battleName = 1; // 战斗服务器名，兼容多种战斗模式
+}
+// 开始游戏
+message JoinBattleRpc{
+	optional UserDat user = 1; // 玩家
+}
+enum JoinBattleResultEnm{
+	OK_JOINBATTLERESULT = 1;
+	ALREADY_IN_BATTLE = 2; // 已经在牌局服
+}
+message JoinBattleRep{
+	optional JoinBattleResultEnm result = 1;
+	optional string battleName = 2; // 战斗服务器名
+}
+// 战斗断线重连
+message RejoinBattleRpc{
+	optional UserDat user = 1; // 玩家
+}
+// 退出战斗服，battle->scene
+message ExitBattleRpc{
+	optional string username = 1;
+}
+
+// 退出战斗服
+message ExitBattleReq{
+}
+
+message ExitBattleRep{
+}
+// 心跳
+message HeartReq{
+}
+
+
+// 设置gateway的转发服务器
+message SetServerRpc{
+	optional string username = 1; // 玩家
+	optional string type = 2; // 服务器类型
+	optional string name = 3; // 服务器名
+}
+
+
+// 每日登录奖励
+message DailyLoginAwardRep{
+	optional int32 gold = 1;
+}
+enum RankTypeEnm{
+	GOLD_RANK = 1;
+	WIN_RANK = 2;
+}
+// 获取列排行榜，每次只返回10个
+message GetRankListReq{
+	optional RankTypeEnm type = 1;
+	optional int32 startIndex = 2; // 开始序号
+}
+// 每一项的数据，根据ranktype数据不一样
+message RankItemDat{
+	optional string username = 1;
+	optional int32 gold = 2;
+	optional int32 winCount = 3;
+	optional int32 gameCount = 4;
+	optional string nickname = 5;
+	optional string portrait = 6;
+	optional int32 score = 7; // 胜率排行榜评分
+}
+message GetRankListRep{
+	optional RankTypeEnm type = 1;
+	optional int32 startIndex = 2;
+	repeated RankItemDat rankItems = 3;
+}
+
+enum ChatChannelTypeEnm{
+	PERSONAL_CHANNEL = 1; //个人
+}
+// 聊天请求
+message ChatReq{
+	repeated string target = 1;
+	optional ChatChannelTypeEnm channel = 2;
+	optional string msg = 3;
+}
+// 聊天请求
+message ChatRep{
+	optional string from = 1;
+	optional ChatChannelTypeEnm channel = 2;
+	optional string msg = 3;
+}
+
+// 邮件数据
+message EmailDat{
+	optional string from = 1;
+	repeated string target = 2;
+	optional int32 gold = 3;
+	optional string msg = 4;
+	optional bool read = 5;
+}
+// 邮件
+message SendEmailReq{
+	optional EmailDat email = 1;
+}
+// 系统邮件
+message EmailRpc{
+	optional EmailDat email = 1;
+}
+// 邮件
+message EmailListRep{
+	repeated EmailDat emailList = 1;
+}
+// 查询邮件
+message GetEmailListReq{
+}
+// 标记为已读
+message SetEmailReadReq{
+	optional int32 index = 1;
+}
+// 发给客户端，同时gateway要再转给scene
+message SetEmailReadRep{
+	optional int32 index = 1;
+	optional int32 gold = 2; // 客户端不能用于维护gold
+}
+// gateway 转给scene收取gold
+message SetEmailReadRpc{
+	optional string username = 1;
+	optional int32 gold = 2;
+}
+// 添加金币,通过redis缓存方式
+message AddTempGoldRpc{
+	optional string username = 1;
+	optional int32 gold = 2;
+}
+enum SetGoldCauseEnm{
+	FROM_EMAIL = 1;
+	AFTER_BATTLE = 2;
+	BY_GM = 3;
+	BY_RECHARGE = 4;
+}
+message SetGoldRpc{
+	optional string username = 1;
+	optional int32 gold = 2;
+	optional SetGoldCauseEnm cause = 3;
+}
+
+// 设置gold
+message SetGoldRep{	
+	optional int32 gold = 1;
+	optional SetGoldCauseEnm cause = 3;
+}
+
+// 好友数据
+message FriendDat{
+	optional string username = 1;
+	optional string nickname = 2;
+	optional bool online = 3;
+	optional string portrait = 4;
+}
+// 登陆是自动返回好友信息
+message FriendListRep{
+	repeated FriendDat friendList = 1;
+	repeated FriendDat requireList = 2; // 被邀请列表，登录后清空
+}
+// 添加好友，暂定好友20个不能主动添加，可以被动添加
+message AddFriendRequireReq{
+	optional string target = 1; // username
+}
+// 发给被添加好友
+message AddFriendBeRequiredRep{
+	optional FriendDat from = 1;
+}
+// 接受请求
+message AcceptFriendReq{
+	optional string from = 1; // username
+}
+// 拒绝请求，不返还
+message RefuseFriendReq{
+	optional string from = 1;
+}
+enum AcceptFriendResultEnm{
+	OK_ACCEPTFRIENDRESULT = 1;
+	FRIEND_NUMBER_ALREADY_20 = 2;
+	NOBODY_REQUIRED = 3;
+}
+// 添加好友成功
+message AcceptFriendRep{
+	optional AcceptFriendResultEnm result = 1;
+	optional FriendDat friend = 2;
+}
+// 删除好友
+message DeleteFriendReq{
+	optional string friend = 1;
+}
+// 返回删除好友
+message DeleteFriendRep{
+	optional string friend = 1;
+}
+// 好友上下线通知
+message FriendOnlineRep{
+	optional string username = 1;
+	optional string nickname = 2; // 可能改了nickname
+	optional string portrait = 3;
+}
+message FriendOfflineRep{
+	optional string username = 1;
+}
+// 进入world
+message EnterWorldRpc{
+	optional string username = 1;
+	optional string gateway = 2;
+}
+message ExitWorldRpc{
+	optional string username = 1;
+}
+// 修改昵称
+message ChangeNicknameReq{
+	optional string nickname = 1;
+}
+enum ChangeNicknameResultEnm{
+	OK_CHANGENICKNAMERESULT = 1;
+	NICKNAME_USED = 2;
+	ERROR_FORMAT = 3;
+}
+message ChangeNicknameRpc{
+	optional string username = 1;
+	optional string nickname = 2;
+}
+message ChangeNicknameRep{
+	optional ChangeNicknameResultEnm result = 1;
+	optional string nickname = 2;
+}
+message FriendChangeNicknameRep{
+	optional string username = 1;
+	optional string nickname = 2;
+}
+// 添加rule，带有显示或者特效
+message AddBuffRep{
+	
+}
+// 删除rule
+message RemoveBuffRep{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////// 德州 //////////////////////////
+
+// 牌局信息
+message SeatInfoDat{
+	optional string username = 1;
+	optional int32 gold = 2;
+	optional int32 bet = 3;
+	optional bool isOut = 4;
+	optional ActionEnm action = 5;
+	repeated int32 cards = 6;
+	optional string nickname = 7;
+	optional string portrait = 8;
+}
+// 客户端收到onStartGame 进入牌局
+message TableInfoRep{
+	optional int32 id = 1;
+	repeated SeatInfoDat seats = 2;
+	repeated int32 pubCards = 3;
+	optional int32 currBet = 4;
+	optional TableModeEnm mode = 5;
+}
+// 开始一个新牌局
+message StartRoundRep{
+	repeated int32 pubCards = 1; // 公共牌
+	repeated int32 seatCards = 2; // 玩家牌
+	optional int32 butten = 3; // 庄家
+	optional int32 blinds = 4; // 小盲注额
+}
+
+enum ActionEnm{
+	WAIT = 1; // 还未行动
+	CHECK = 2; // 让牌
+	CALL = 3; // 跟注
+	RAISE = 4; // 加注
+	ALLIN = 5; // all in
+	FOLD = 6; // 弃牌
+}
+// 通知客户端行动
+message CallActionRep{
+	optional int32 seat = 1;
+}
+
+// 客户端下注
+message ActionReq{
+	optional ActionEnm action = 1;
+	optional int32 bet = 2;
+}
+enum ActionResultEnm{
+	OK_ACTIONRESULT = 1;
+	GOLD_NOT_ENOUGH = 2; // 金币不足
+	ACTION_INVALIDITY = 3; // 操作非法
+	NOT_YOUR_TURN = 4; // 未轮到
+}
+// 下注广播
+message ActionRep{
+	optional ActionResultEnm result = 1;
+	optional int32 seat = 2;
+	optional ActionEnm action = 3;
+	optional int32 gold = 4;
+	optional int32 bet = 5;
+}
+
+// 位置类型
+enum SeatTypeEnm{
+	NOBODY = 1; // 空位置
+	PLAYER = 2;
+	AI = 3; // 玩家类型
+}
+
+// 发牌
+message SendCardRep{
+	optional int32 card = 1;
+}
+
+// 离开桌子
+message LeaveTableReq{
+}
+
+// 离开桌子
+message LeaveTableRep{
+	optional int32 seat = 1;
+}
+message WinnerDat{
+	optional int32 seat = 1;
+	repeated int32 cards = 2; // 赢的牌型
+	optional int32 gold = 3;
+	optional int32 bet = 4; // 注额
+}
+message SeatCardDat{
+	optional int32 seat = 1;
+	repeated int32 cards = 2; // 牌
+}
+// 一局结果
+message RoundResultRep{
+	repeated WinnerDat winners = 1;
+	repeated SeatCardDat seats = 2; // 各个座位牌信息
+}
+enum TableModeEnm{
+	MATCH_MODE_5 = 1; // 5人匹配场
+	MATCH_MODE_9 = 2; // 9人匹配
+}
+// 匹配牌局
+message MatchTableReq{
+	optional TableModeEnm mode = 1; // 人数
+}
+enum MatchTableResultEnm{
+	OK_MATCHTABLERESULT = 1;
+	ALREADY_IN_QUEUE = 2;
+}
+message MatchTableRep{
+	optional MatchTableResultEnm result = 1;
+}
+// 取消匹配
+message CancelMatchTableReq{
+}
+message CancelMatchTableRep{
+}
+// 加入牌桌
+message JoinTableReq{
+	optional int32 id = 1;
+}
+enum JoinTableResultEnm{
+	OK_JOINTABLERESULT = 1;
+	NO_EMPTY_SEAT = 2;
+	TABLE_DISTROYED = 3;
+}
+// 加入牌桌返回
+message JoinTableRep{
+	optional JoinTableResultEnm result = 1;
+}
+// 有人加入
+message SitDownSeatInfoRep{
+	optional int32 seatIndex = 1;
+	optional SeatInfoDat seatInfo = 2;
+}
+// 获取桌子列表
+message GetTableListReq{
+	optional int32 startIndex = 1; // 列表开始序号，一次只发送20个
+}
+message TableInfoDat{
+	optional int32 id = 1;
+	optional int32 emptySeat = 2; // 空位置
+	optional TableModeEnm mode = 3;
+}
+// 返回桌子列表
+message GetTableListRep{
+	repeated TableInfoDat tableList = 1;
+}
+// 掉线通知
+message SeatOfflineRep{
+	optional int32 seat = 1; // 
+	optional bool isOffline = 2;
+}
+// 上线通知
+message SeatOnlineRep{
+	optional int32 seat = 1; 
+}
+
+
+
+
+
+
+
+
+
+
+
+///////////////////// 爆炸兄弟 //////////////////////////
+// 排位请求
+message MatchBattleReq{
+
+}
+enum MatchBattleResultEnm{
+	OK_MATCHBATTLERESULT = 1;
+	ALREADY_IN_MATCH_QUEUE = 2;
+	ALREADY_IN_BATTLE_FIELD = 3; // 已经在战场
+}
+// 匹配返回
+message MatchBattleRep{
+	optional MatchBattleResultEnm result = 1;
+}
+// 取消匹配
+message CancelMatchBattleReq{
+}
+//
+message CancelMatchBattleRep{
+}
+// 战场玩家信息
+message BattleUserInfoDat{
+	optional string username = 1;
+	optional int32 level = 2; // 等级
+}
+// 战场信息
+message BattleFieldInfoRep{
+	optional int32 id = 1;
+	repeated BattleUserInfoDat team1 = 2;
+	repeated BattleUserInfoDat team2 = 3;
+}
+// 离开战场
+message LeaveBattleReq{
+}
+// 离开战场通知
+message LeaveBattleRep{
+	optional string username = 1; // 离开的玩家
+}
+// 客户端移动位置请求
+message MoveToReq{
+	optional int32 x = 1;
+	optional int32 y = 2;
+}
+// 服务端通知客户端移动
+message MoveToRep{
+	optional int32 id = 1; // 移动物体id，可能是人，可能是战场物体
+	optional int32 x = 2;
+	optional int32 y = 3;
+}
+// 客户端使用技能
+message UseSkillReq{
+	optional int32 skillID = 1; 
+	optional int32 target = 2; // 目标id
+	optional int32 tox = 3; // 目标位置
+	optional int32 toy = 4; 
+}
+// 使用技能通知
+message UseSkillRep{
+	optional int32 source = 1; // 技能使用者
+	optional int32 skillID = 2;
+	optional int32 target = 3;
+	optional int32 tox = 4;
+	optional int32 toy = 5;
+}
+// 技能命中
+message SkillHitRep{
+
+}
+// 增加战场实体
+message AddBattleEntityRep{
+	optional int32 source = 1; // 战场实体来源
+	optional int32 id = 2;
+	optional int32 tempID = 3; // 实体模板id
+	optional int32 x = 4; // 实体位置
+	optional int32 y = 5; // 
+}
+// 移除战场实体，当移除的时候可以播放爆炸等动作
+message RemoveBattleEntityRep{
+	optional int32 id = 1; // 实体id
+}
+// 属性类型
+enum PropertyEnm{
+	EXP = 1;
+	HP = 2; // 属性值
+	HP_MAX = 3; // 最大生命值
+	MP = 4;
+	MP_MAX = 5; // 最大魔法值
+	SPEED = 6; // 移动速度
+	ATTACK = 7; // 攻击力
+	ATTACK_DEFENSE = 8;
+	ATTACK_SPEED = 9;
+	ATTACK_SHIELD = 10; // 物理盾牌，抵消物理伤害
+	MAGIC = 11; // 法术强度
+	MAGIC_DEFENSE = 12; // 法抗
+	MAGIC_COOL_DOWN = 13; // cd
+	MAGIC_SHIELD = 14; // 法术盾牌，抵消法术伤害
+	CRIT_RATE = 15; // 暴击率
+	CRIT_DEMAGE = 16; // 暴击伤害
+	CRIT_SHIELD = 17; // 暴击盾牌，抵消暴击伤害
+	REAL_DEMAGE = 18; // 真实伤害
+	GOLD = 19;
+}
+// 属性值
+message PropertyDat{
+	optional PropertyEnm property = 1;
+	optional int32 value = 2;
+}
+// 属性更新，可能增加，可能减少，可能同时改变几个属性
+message PropertyUpdateRep{
+	optional int32 id = 1; // 实体id
+	repeated PropertyDat properties = 2;
+}
+// 掉线通知
+message HeroOfflineRep{
+	optional string username = 1;
+	optional bool isOffline = 2;
+}
+// call ban hero
+message CallBanHeroRep{
+	optional string username = 1;
+}
+message BanHeroReq{
+	optional int32 heroTempID = 1;
+}
+enum BanHeroResultEnm{
+	OK_BANHERORESULT = 1;
+	FAIL_BANHERORESULT = 2;
+}
+message BanHeroRep{
+	optional BanHeroResultEnm result = 1;
+	optional string username = 2;
+	optional int32 heroTempID = 3;
+}
+// call select hero
+message CallSelectHeroRep{
+	optional string username = 1;
+}
+message SelectHeroReq{
+	optional int32 heroTempID = 1;
+}
+enum SelectHeroResultEnm{
+	OK_SELECTHERORESULT = 1;
+	FAIL_SELECTHERORESULT = 2;
+}
+message SelectHeroRep{
+	optional SelectHeroResultEnm result = 1;
+	optional string username = 2;
+	optional int32 heroTempID = 3;
+}
+// 由于某些原因重新排队
+enum RematchCauseEnm{
+	SOMEONE_RUN = 1;
+	NOT_READY = 2;
+}
+// 逃跑者也会收到，但不能进入匹配状态，其它玩家进入匹配
+message RematchBattleRep{
+	optional RematchCauseEnm cause = 1;
+	optional string runner = 2;
+}
+
+enum CampTypeEnm{
+	BOOM_CAMP = 1; // 爆炸阵营
+	RULER_CAMP = 2; // 黑暗阵营
+	NEUTRAL_CAMP = 3; // 中立阵营
+}
+// 战斗结果
+message BattleResultRep{
+}
+enum BattleEntityTypeEnm{
+	HERO_ENTITY = 1;
+	SOLDIER_ENTITY = 2;
+	NEUTRAL_ENTITY = 3;
+	BUILDING_ENTITY = 4; //防御塔,小炮台等
+	TRAP_ENTITY = 5; // 各种技能效果，
+}
+
+enum BattlePlayerTypeEnm{
+	PLAYER_BP = 1;
+	AI_BP = 2;
+}
+// 实体数据
+message BattleEntityDat{
+	optional string username = 1;
+	optional int32 id = 2;
+	optional int32 hp = 3;
+	optional int32 hpMax = 4;
+	optional int32 speed = 5;
+	optional int32 x = 6;
+	optional int32 y = 7;
+}
+// 战场实体信息
+message BattleFieldEntityRep{
+	repeated BattleEntityDat entityList = 1;
+}
+
+// 加载完成，客户端向服务端发送，如果未收到rep，持续向服务端发送
+// 使用udp向服务端发送，服务端通过这个接口绑定客户端
+message BattleLoadCompletedReq{
+	optional string username = 1; // 需要身份验证
+	optional int32 cid = 2; // 验证数字
+	optional int32 percent = 3;
+}
+// 客户端接收到这个表示服务端绑定udp成功，可能是别人加载成功
+message BattleLoadCompletedRep{
+	optional string username = 1;
+	optional int32 percent = 2; // 百分比 0-100
+}
+// 准备战斗，出门
+message ReadyForFightingRep{
+}
+// 开始战斗
+message StartFightingRep{
+}
+
+enum BattleActionTypeEnm{
+	MOVE_BATTLE = 1;
+	SKILL_BATTLE = 2;
+}
+// 行动
+message BattleActionReq{
+	optional string username = 1; // 用户
+	optional int32 cid = 2; // 验证数字
+	optional BattleActionTypeEnm action = 3;
+	optional int32 skillID = 4; // 技能id
+	optional int32 toX = 5; // 目标位置
+	optional int32 toY = 6;
+	optional int32 target = 7; // 目标id
+}
+// 
+message BattleActionRep{
+	optional int32 id = 1;
+	optional int32 skillID = 2;
+	optional int32 toX = 3;
+	optional int32 toY = 4;
+	optional int32 target = 5;
+}
+
+message ChangePortraitReq{
+	optional string portrait = 1;
+}
+
+message ChangePortraitRep{
+	optional string portrait = 1;
+}
+// 踢人
+message KickOutRpc{
+	optional string username = 1;
+}
+enum LogTypeEnm{
+	ADD_GOLD_LOG = 1; // 加金币
+	ERROR_LOG = 2; // 严重错误记录
+	RECHARGE_LOG = 3; // 充值
+	GMCOMMAND_LOG = 4; // gm
+}
+// log
+message LogRpc{
+	optional LogTypeEnm type = 1;
+	optional string username = 2;
+	optional int32 gold = 3;
+	optional string log = 4;
+	optional string cmd = 5;
+	optional string args = 6;
+	optional string orderid = 7;
+	optional string gm = 8;
+	optional SetGoldCauseEnm cause = 9;
+}
+
+// 充值通知
+message RechargeRpc{
+	optional string username = 1;
+	optional int32 amount = 2; // rmb
+}
+
+// 请求充值
+message RechargeReq{
+	optional string orderID = 1; // 订单号
+}
+
+// 服务端收到通知
+message RechargeRep{
+	optional string orderID = 1;
+}
+
+// 通过渠道登录
+message AnySdkLoginReq{
+	optional string username = 1;
+	optional string password = 2;
+	optional repeated string keys = 3; // sdk参数，如果需要的都写上包括username，password
+	optional repeated string values = 4;
+}
+// 登录返回，等sdk验证通过后，返回LoginRep
+message AnySdkLoginRep{
+	optional LoginResultEnm result = 1;
+	optional string sdkMsg = 2; // anysdk 返回消息
+}

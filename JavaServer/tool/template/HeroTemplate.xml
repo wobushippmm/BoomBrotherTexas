@@ -1,0 +1,19 @@
+<HeroTemplate>
+	<Define>
+		<HeroTemp id="int" name="string" type="int" prop1="long" prop2="float" prop3="double" pro4="date">
+			<HasSkillTemp id="int" type="int"/>
+		</HeroTemp>
+	</Define>
+	<HeroTemp id="1" name="盖伦" type="1">
+		<HasSkillTemp id="1" type="1"/>
+		<HasSkillTemp id="2" type="2"/>
+		<HasSkillTemp id="3" type="2"/>
+		<HasSkillTemp id="4" type="2"/>
+	</HeroTemp>
+	<HeroTemp id="2" name="寒冰射手" type="2">
+		<HasSkillTemp id="5" type="1"/>
+		<HasSkillTemp id="6" type="2"/>
+		<HasSkillTemp id="7" type="2"/>
+		<HasSkillTemp id="8" type="2"/>
+	</HeroTemp>
+</HeroTemplate>

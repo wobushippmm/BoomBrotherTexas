@@ -1,0 +1,12 @@
+<TableModeTemplate>
+	<Define>
+		<!-- gold:进牌局携带金币数-->
+		<TableModeTemp id="int" name="string" seatNum="int" minLevel="int" gold="int" blinds="int" step="int"/>
+	</Define>
+	<TableModeTemp id="1" name="5人普通局" seatNum="5" minLevel="0" gold="100" blinds="20" step="10"/>
+	<TableModeTemp id="2" name="7人普通局" seatNum="7" minLevel="0" gold="100" blinds="20" step="10"/>
+	<TableModeTemp id="3" name="5人富豪局" seatNum="5" minLevel="0" gold="10000" blinds="1000" step="1000"/>
+	<TableModeTemp id="4" name="7人富豪局" seatNum="7" minLevel="0" gold="10000" blinds="1000" step="1000"/>
+	<TableModeTemp id="5" name="5人超级富豪局" seatNum="5" minLevel="0" gold="100000" blinds="1000" step="1000"/>
+	<TableModeTemp id="6" name="7人超级富豪局" seatNum="7" minLevel="0" gold="100000" blinds="1000" step="1000"/>
+</TableModeTemplate>

@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Sat Apr 15 08:09:47 CST 2017
+onejar.license.required=false
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=true
+jarname=E\:\\work\\JavaServer\\tool\\TemplateCreater.jar
+manifest.mergeall=true
+manifest.mainclass=template.tool.TemplateCreater
+manifest.file=<createnew>
+jarname.isextern=true
+onejar.expand=
+excludes=<po|ServerCore>~core/;<po|ServerCore>~logic/;<po|ServerCore>~protocol/;<po|ServerCore>~template/~TemplateReader.class;<po|ServerCore>~ui/;<po|ServerCore>~utils/;<jar|protobuf-java-3.2.0.jar>;<jar|jedis-2.9.0.jar>;<jar|log4j-1.2.17.jar>;<jar|netty-all-4.1.9.Final.jar>
+includes=

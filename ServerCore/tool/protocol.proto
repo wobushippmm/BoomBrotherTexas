@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+option java_package="protocol";
+option java_outer_classname="Protocol";
+
+// po 协议框架，不要自定义
+// req client->server 
+// rep server->client
+// rpc server->server
+// dat data
+// enm enum
+
+// 服务器之间打招呼
+message HelloRpc{
+	string type = 1;
+	int32 port = 2;
+	string name = 3;
+	int32 websocketPort = 4;
+	int32 udpPort = 5;
+}
+
+// sos退出
+message QuitRpc{
+
+}
+
+// 心跳
+message HeartRpc{
+}
+
+// 网络地址
+message AddressDat{
+	string address = 1;
+	int32 port = 2;
+	string name = 3;
+	string type = 4;
+	int32 websocketPort = 5;
+	int32 udpPort = 6;
+}
+
+// 服务器列表
+message ServerListRpc{
+	repeated AddressDat serverList = 1;
+}
+
+// 所有消息的最终格式
+message RpcPo{
+	string rpc = 1; // rpc函数名
+	HelloRpc helloRpc = 2;
+	ServerListRpc serverListRpc = 3;
+	QuitRpc quitRpc = 4;
+	HeartRpc heartRpc = 5;
+	bytes anyPo = 6; // 二次序列化的数据，兼容后续自定义的消息
+	string clientName = 7; // 发送给客户端的时候，或发给逻辑服的时候用
+	string gateway = 8; // 客户端绑定的gateway
+}
+
+
+enum DisconnectCauseEnm{
+	UNDEFINE_DISCONNECTCASE = 0;
+	LOGIN_OTHER_CLIENT = 1; // 其它地方登陆
+}
+// 掉线通知
+message DisconnectRep{
+	DisconnectCauseEnm cause = 1;
+}

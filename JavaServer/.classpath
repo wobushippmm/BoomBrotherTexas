@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<accessrules>
+			<accessrule kind="accessible" pattern="**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/ServerCore"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/protobuf-java-3.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jedis-2.9.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="lib/netty-all-4.1.10.Final-20170420.120616-42.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.42-bin.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-http-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-io-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-security-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-server-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-servlet-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-util-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-webapp-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-xml-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/servlet-api-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/javax.el-3.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/javax.servlet.jsp-2.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/javax.servlet.jsp-api-2.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/javax.servlet.jsp.jstl-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/jetty-jsp-9.2.21.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/jetty-jsp-jdt-2.3.3.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/org.eclipse.jdt.core-3.8.2.v20130121.jar"/>
+	<classpathentry kind="lib" path="lib/jsp/org.eclipse.jetty.orbit.javax.servlet.jsp.jstl-1.2.0.v201105211821.jar"/>
+	<classpathentry kind="lib" path="lib/fastjson-1.2.9.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
